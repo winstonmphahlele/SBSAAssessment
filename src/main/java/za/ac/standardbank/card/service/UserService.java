@@ -36,7 +36,7 @@ public class UserService {
     }
 
     public void update(UserDto userDto) {
-        User user = userRepository.save(USER_MAPPER.mapUserDtoToUser(userDto));
+        User user = userRepository.update(USER_MAPPER.mapUserDtoToUser(userDto));
         userRepository.update(user);
     }
 
