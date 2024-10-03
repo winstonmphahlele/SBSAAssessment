@@ -25,7 +25,7 @@ public abstract class BaseRepository<T, ID> implements CRUDRepository<T, ID> {
     @Override
     @Transactional
     public T update(T entity) {
-        getEntityManager().merge(entity);
+        entityManager.merge(entity);
         return entity;
     }
 
