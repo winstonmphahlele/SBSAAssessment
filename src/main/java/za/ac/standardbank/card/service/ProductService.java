@@ -24,9 +24,15 @@ public class ProductService {
         return productDtos;
     }
 
-    public ProductDto findById(Long id) {
+    private Product findProductById(Long id) {
         Product product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(400, "Product with id " + id + " not found"));
-        return PRODUCT_MAPPER.mapProductToProductDto(product);
+        return product;
+    }
+
+    public ProductDto findById(Long id) {
+        Product product = findProductById(id);
+        ProductDto productDto = PRODUCT_MAPPER.mapProductToProductDto(product);
+        return productDto;
     }
 
     public ProductDto save(ProductDto productDto) {
@@ -36,12 +42,11 @@ public class ProductService {
 
     public void update(ProductDto productDto) {
         Product product = productRepository.update(PRODUCT_MAPPER.mapProductDtoToProduct(productDto));
-
         productRepository.update(product);
     }
 
     public void delete(Long id) {
-        Product productToDelete = PRODUCT_MAPPER.mapProductDtoToProduct(findById(id));
+        Product productToDelete = findProductById(id);
         productRepository.delete(productToDelete);
     }
 

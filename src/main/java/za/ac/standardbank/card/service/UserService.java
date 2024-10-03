@@ -25,9 +25,15 @@ public class UserService {
         return userDtos;
     }
 
+    private User findUserById(Long id){
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(400,"User with id " + id + " not found"));
+        return user;
+    }
+
     public UserDto findById(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(400, "User with id " + id + " not found"));
-        return USER_MAPPER.mapUserToUserDto(user);
+        User user = findUserById(id);
+        UserDto userDto = USER_MAPPER.mapUserToUserDto(user);
+        return userDto;
     }
 
     public UserDto save(UserDto userDto) {
@@ -41,7 +47,7 @@ public class UserService {
     }
 
     public void delete(Long id) {
-        User userToDelete = USER_MAPPER.mapUserDtoToUser(findById(id));
+        User userToDelete = findUserById(id);
         userRepository.delete(userToDelete);
     }
 

@@ -5,6 +5,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import za.ac.standardbank.card.dto.UserDto;
+import za.ac.standardbank.card.security.Auth;
 import za.ac.standardbank.card.service.UserService;
 
 import java.util.List;
@@ -34,6 +35,7 @@ public class UserResource {
     @DELETE()
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
+    @Auth(role = "admin")
     public Response deleteUser(@PathParam(value = "id") Long id) {
         userService.delete(id);
         return Response.status(Response.Status.OK).build();
