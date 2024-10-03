@@ -1,4 +1,4 @@
-package za.ac.standardbank.card.sbsaassessment;
+package za.ac.standardbank.card;
 
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.core.Application;

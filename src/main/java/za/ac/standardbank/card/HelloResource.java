@@ -1,4 +1,4 @@
-package za.ac.standardbank.card.sbsaassessment;
+package za.ac.standardbank.card;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
