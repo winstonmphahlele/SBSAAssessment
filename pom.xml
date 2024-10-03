@@ -29,6 +29,8 @@
         <jwt.version>0.12.6</jwt.version>
         <jakarta.security.version>3.0.0</jakarta.security.version>
         <junit.version>5.10.0</junit.version>
+        <mockito.version>5.4.0</mockito.version>
+        <apache.common.lang3.version>3.17.0</apache.common.lang3.version>
     </properties>
 
     <dependencies>
@@ -140,9 +142,17 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>5.4.0</version>
+            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- apache commons-lang3 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${apache.common.lang3.version}</version>
+        </dependency>
+
     </dependencies>
 
     <build>
