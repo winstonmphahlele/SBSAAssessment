@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+
+  postgres-container:
+    container_name: "postgres-container"
+    image: postgres:14
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: P@ssw0rd
+      POSTGRES_DB: sbsapocdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    # networks:
+    #   - sbsa-network
+
+  back-end:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - WILDFLY_USER=admin
+      - WILDFLY_PASSWORD=password
+      - DATA_SOURCE_CLI=add-datasource.cli
+    ports:
+      - "8080:8080"
+      - "9990:9990"
+    depends_on:
+      - postgres-container
+    volumes:
+      - ./resources:/resources
+    restart: on-failure
+    # networks:
+    #   - sbsa-network
+
+volumes:
+  postgres_data:
+# networks:
+#   sbsa-network:
+#     external: true
