@@ -1,0 +1,29 @@
+embed-server \
+--server-config=standalone.xml \
+--std-out=echo
+
+batch
+
+# add PostgreSQL module on JBoss
+module add \
+--name=postgresql \
+--resources=/resources/postgresql.jar \
+--dependencies=javax.api,javax.transaction.api
+
+# add PostgreSQL driver
+/subsystem=datasources/jdbc-driver=postgresql:add(driver-name="postgresql",\
+driver-module-name="postgresql",\
+driver-class-name=org.postgresql.Driver)
+
+# create datasource
+data-source add \
+--name=SBSApocDS \
+--jndi-name=java:/SBSApocDS \
+--connection-url=jdbc:postgresql://postgres-container:5432/sbsapocdb \
+--driver-name=postgresql \
+--user-name=postgres \
+--password=P@ssw0rd
+
+run-batch
+
+stop-embedded-server
