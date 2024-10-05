@@ -90,7 +90,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    public void testUpdate() throws ResourceServiceException {
+    public void testUpdate() throws ResourceNotFoundException, ResourceServiceException {
         when(productRepository.save(any(Product.class))).thenReturn(product);
         ProductResponse productResponse = productService.update(updateProductRequest);
         verify(productRepository).update(any(Product.class));

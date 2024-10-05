@@ -91,7 +91,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testUpdate() throws ResourceServiceException, ResourceAlreadyExistsException {
+    public void testUpdate() throws ResourceNotFoundException, ResourceServiceException, ResourceAlreadyExistsException {
         when(userRepository.save(any(User.class))).thenReturn(user);
         userService.update(updateUserRequest);
         verify(userRepository).update(any(User.class));

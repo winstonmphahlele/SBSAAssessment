@@ -1,6 +1,7 @@
 package za.ac.standardbank.card.resource;
 
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -24,7 +25,7 @@ public class ProductResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createProduct(CreateProductRequest productRequest) {
+    public Response createProduct(@Valid CreateProductRequest productRequest) {
         try {
             ProductResponse response = productService.save(productRequest);
             return Response.status(Response.Status.CREATED).entity(response).build();
@@ -38,10 +39,12 @@ public class ProductResource {
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateProduct(UpdateProductRequest updateProductRequest) {
+    public Response updateProduct(@Valid UpdateProductRequest updateProductRequest) {
         try {
             ProductResponse updateProductResponse = productService.update(updateProductRequest);
             return Response.status(Response.Status.OK).entity(updateProductResponse).build();
+        }catch (ResourceNotFoundException ex) {
+            return ResourceUtil.resourceExceptionResponse(ex, Response.Status.CONFLICT.getStatusCode());
         } catch (ResourceServiceException ex) {
             return ResourceUtil.resourceExceptionResponse(ex, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
         }

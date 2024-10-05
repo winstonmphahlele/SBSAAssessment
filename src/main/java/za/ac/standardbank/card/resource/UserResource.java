@@ -42,11 +42,13 @@ public class UserResource {
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateUser(UpdateUserRequest updateUserRequest) {
+    public Response updateUser(@Valid UpdateUserRequest updateUserRequest) {
        try {
            UserResponse updatedUserResponse = userService.update(updateUserRequest);
            return Response.status(Response.Status.OK).entity(updatedUserResponse).build();
-       }catch (ResourceServiceException ex){
+       }catch (ResourceNotFoundException ex) {
+           return ResourceUtil.resourceExceptionResponse(ex, Response.Status.CONFLICT.getStatusCode());
+       } catch (ResourceServiceException ex){
            return ResourceUtil.resourceExceptionResponse(ex, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
        }
     }

@@ -53,13 +53,15 @@ public class ProductService {
         }
     }
 
-    public ProductResponse update(UpdateProductRequest updateProductRequest) throws ResourceServiceException {
+    public ProductResponse update(UpdateProductRequest updateProductRequest) throws ResourceNotFoundException, ResourceServiceException {
         try {
             Product product = productRepository.update(PRODUCT_MAPPER.mapUpdateProductRequestToProduct(updateProductRequest));
             product = productRepository.update(product);
             ProductResponse productResponse = PRODUCT_MAPPER.mapProductToProductResponse(product);
             return productResponse;
 
+        }catch (ResourceNotFoundException ex) {
+            throw new ResourceNotFoundException(50003, String.format("Product with ID: %s does not exits", updateProductRequest.getId()), null, ex);
         } catch (RepositoryException ex) {
             throw new ResourceServiceException(50003, String.format("%s %s", "Error Updating product : ", ex.getMessage()), null, ex);
         }

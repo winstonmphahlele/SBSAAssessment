@@ -53,13 +53,15 @@ public class UserService {
         }
     }
 
-    public UserResponse update(UpdateUserRequest updateUserRequest) throws ResourceServiceException {
+    public UserResponse update(UpdateUserRequest updateUserRequest) throws ResourceNotFoundException, ResourceServiceException {
         try {
             User updatedUser = userRepository.update(USER_MAPPER.mapUpdateUserRequestToUser(updateUserRequest));
             UserResponse userResponse = USER_MAPPER.mapUserToUserResponse(updatedUser);
             return userResponse;
+        }catch (ResourceNotFoundException ex) {
+            throw new ResourceNotFoundException(50004, String.format("User with ID: %s does not exits", updateUserRequest.getId()), null, ex);
         } catch (RepositoryException ex) {
-            throw new ResourceServiceException(50003, String.format("%s %s", "Error Updating user : ", ex.getMessage()), null, ex);
+            throw new ResourceServiceException(50004, String.format("%s %s", "Error Updating user : ", ex.getMessage()), null, ex);
         }
     }
 

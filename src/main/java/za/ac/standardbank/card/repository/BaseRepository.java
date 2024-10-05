@@ -1,11 +1,9 @@
 package za.ac.standardbank.card.repository;
 
-import jakarta.persistence.EntityExistsException;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.PersistenceException;
+import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
 import za.ac.standardbank.card.exception.RepositoryException;
+import za.ac.standardbank.card.exception.ResourceNotFoundException;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,8 +30,14 @@ public abstract class BaseRepository<T, ID> implements CRUDRepository<T, ID> {
     }
     @Override
     @Transactional
-    public T update(T entity) throws RepositoryException{
+    public T update(T entity) throws ResourceNotFoundException, RepositoryException{
         try {
+
+            Optional<T> optionalEntity = findById(getEntityId(entity));
+            if (optionalEntity.isEmpty()) {
+                throw new ResourceNotFoundException(5004,"Entity not found!", null, null);
+            }
+
             T updatedEntity = entityManager.merge(entity);
             return updatedEntity;
         } catch (PersistenceException e) {
@@ -58,4 +62,5 @@ public abstract class BaseRepository<T, ID> implements CRUDRepository<T, ID> {
     public abstract List<T> findAll();
     // Abstract method to get the entity class type
     protected abstract Class<T> getEntityClass();
+    protected abstract ID getEntityId(T entity);
 }
