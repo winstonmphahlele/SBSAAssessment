@@ -1,27 +1,27 @@
 package za.ac.standardbank.card.mapper;
 
 import org.junit.jupiter.api.Test;
-import za.ac.standardbank.card.dto.UserDto;
 import za.ac.standardbank.card.model.User;
+import za.ac.standardbank.generated.CreateUserRequest;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class UserMapperTest {
     private final UserMapper userMapper = UserMapper.instance;
 
     @Test
-    void mapUserDtoToUser() {
-        UserDto userDto = new UserDto();
-        userDto.setEmail("test@example.com");
-        User user = userMapper.mapUserDtoToUser(userDto);
-        assertEquals(userDto.getEmail(), user.getEmail());
+    void mapCreateUserRequestToUser() {
+        CreateUserRequest createUserRequest = new CreateUserRequest();
+        createUserRequest.setEmail("test@example.com");
+        User user = userMapper.mapCreateUserRequestToUser(createUserRequest);
+        assertEquals(createUserRequest.getEmail(), user.getEmail());
     }
 
     @Test
-    void mapUserToUserDto() {
+    void mapUserToCreateUserRequest() {
         User user = new User();
         user.setEmail("test@example.com");
-        UserDto userDto = userMapper.mapUserToUserDto(user);
-        assertEquals(user.getEmail(), userDto.getEmail());
+        CreateUserRequest createUserRequest = userMapper.mapUserToCreateUserRequest(user);
+        assertEquals(user.getEmail(), createUserRequest.getEmail());
     }
 }

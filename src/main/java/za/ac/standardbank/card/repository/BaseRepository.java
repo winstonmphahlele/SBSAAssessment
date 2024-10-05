@@ -1,8 +1,11 @@
 package za.ac.standardbank.card.repository;
 
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.PersistenceException;
 import jakarta.transaction.Transactional;
+import za.ac.standardbank.card.exception.RepositoryException;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,15 +21,24 @@ public abstract class BaseRepository<T, ID> implements CRUDRepository<T, ID> {
 
     @Override
     @Transactional
-    public T save(T entity) {
-        entityManager.persist(entity);
-        return entity;
+    public T save(T entity) throws EntityExistsException, RepositoryException{
+        try {
+            entityManager.persist(entity);
+            return entity;
+        } catch (PersistenceException e) {
+            throw new RepositoryException(e.getMessage(), null);
+        }
+
     }
     @Override
     @Transactional
-    public T update(T entity) {
-        entityManager.merge(entity);
-        return entity;
+    public T update(T entity) throws RepositoryException{
+        try {
+            T updatedEntity = entityManager.merge(entity);
+            return updatedEntity;
+        } catch (PersistenceException e) {
+            throw new RepositoryException(e.getMessage(), null);
+        }
     }
 
     @Override

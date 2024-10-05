@@ -5,10 +5,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import za.ac.standardbank.card.dto.UserDto;
+import za.ac.standardbank.card.exception.ResourceAlreadyExistsException;
 import za.ac.standardbank.card.exception.ResourceNotFoundException;
+import za.ac.standardbank.card.exception.ResourceServiceException;
 import za.ac.standardbank.card.model.User;
 import za.ac.standardbank.card.repository.implementation.UserRepository;
+import za.ac.standardbank.generated.CreateUserRequest;
+import za.ac.standardbank.generated.UpdateUserRequest;
+import za.ac.standardbank.generated.UserResponse;
 
 import java.util.Collections;
 import java.util.List;
@@ -27,7 +31,9 @@ public class UserServiceTest {
     private UserRepository userRepository;
 
     private User user;
-    private UserDto userDto;
+    private CreateUserRequest createUserRequest;
+
+    private UpdateUserRequest updateUserRequest;
 
     @BeforeEach
     public void setUp() {
@@ -35,25 +41,32 @@ public class UserServiceTest {
 
         user = new User();
         user.setId(1L);
+        user.setName("John Doe");
         user.setEmail("test@example.com");
-        userDto = new UserDto();
-        userDto.setEmail("test@example.com");
+
+        createUserRequest = new CreateUserRequest();
+        createUserRequest.setEmail("test@example.com");
+
+        updateUserRequest = new UpdateUserRequest();
+        updateUserRequest.setId(1L);
+        updateUserRequest.setName("James Doe");
+        updateUserRequest.setEmail("updatedtest@example.com");
     }
 
     @Test
     public void testFindAll() {
         when(userRepository.findAll()).thenReturn(Collections.singletonList(user));
-        List<UserDto> userDtos = userService.findAll();
-        assertEquals(1, userDtos.size());
-        assertEquals(user.getEmail(), userDtos.get(0).getEmail());
+        List<UserResponse> foundUsers = userService.findAll();
+        assertEquals(1, foundUsers.size());
+        assertEquals(user.getEmail(), foundUsers.get(0).getEmail());
         verify(userRepository).findAll();
     }
 
     @Test
-    public void testFindById_UserExists() {
+    public void testFindById_UserExists() throws ResourceNotFoundException {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        UserDto foundUserDto = userService.findById(1L);
-        assertEquals(user.getEmail(), foundUserDto.getEmail());
+        UserResponse foundUser = userService.findById(1L);
+        assertEquals(user.getEmail(), foundUser.getEmail());
         verify(userRepository).findById(1L);
     }
 
@@ -66,20 +79,22 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testSave() {
+    public void testSave() throws ResourceServiceException, ResourceAlreadyExistsException {
         when(userRepository.save(any(User.class))).thenReturn(user);
 
-        UserDto savedUserDto = userService.save(userDto);
+        UserResponse userResponse = userService.save(createUserRequest);
 
-        assertNotNull(savedUserDto, "Saved UserDto should not be null");
-        assertEquals(userDto.getEmail(), savedUserDto.getEmail());
+        assertNotNull(userResponse, "Saved UserDto should not be null");
+        assertEquals(userResponse.getEmail(), createUserRequest.getEmail());
         verify(userRepository).save(any(User.class));
     }
 
     @Test
-    public void testUpdate() {
+    public void testUpdate() throws ResourceServiceException, ResourceAlreadyExistsException {
         when(userRepository.save(any(User.class))).thenReturn(user);
-        userService.update(userDto);
+        userService.save(createUserRequest);
+        UserResponse userResponse = userService.update(updateUserRequest);
+        assertEquals(userResponse.getEmail(), updateUserRequest.getEmail());
         verify(userRepository).update(any(User.class));
     }
 
