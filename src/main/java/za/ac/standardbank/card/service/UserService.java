@@ -54,10 +54,8 @@ public class UserService {
     }
 
     public UserResponse update(UpdateUserRequest updateUserRequest) throws ResourceServiceException {
-
         try {
-            User userToUpdate = USER_MAPPER.mapUpdateUserRequestToUser(updateUserRequest);
-            User updatedUser = userRepository.update(userToUpdate);
+            User updatedUser = userRepository.update(USER_MAPPER.mapUpdateUserRequestToUser(updateUserRequest));
             UserResponse userResponse = USER_MAPPER.mapUserToUserResponse(updatedUser);
             return userResponse;
         } catch (RepositoryException ex) {

@@ -2,11 +2,17 @@ package za.ac.standardbank.card.service;
 
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
-import za.ac.standardbank.card.dto.ProductDto;
+import jakarta.persistence.EntityExistsException;
+import za.ac.standardbank.card.exception.RepositoryException;
+import za.ac.standardbank.card.exception.ResourceAlreadyExistsException;
 import za.ac.standardbank.card.exception.ResourceNotFoundException;
+import za.ac.standardbank.card.exception.ResourceServiceException;
 import za.ac.standardbank.card.mapper.ProductMapper;
 import za.ac.standardbank.card.model.Product;
 import za.ac.standardbank.card.repository.implementation.ProductRepository;
+import za.ac.standardbank.generated.CreateProductRequest;
+import za.ac.standardbank.generated.ProductResponse;
+import za.ac.standardbank.generated.UpdateProductRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,34 +24,48 @@ public class ProductService {
 
     private static final ProductMapper PRODUCT_MAPPER = ProductMapper.instance;
 
-    public List<ProductDto> findAll() {
+    public List<ProductResponse> findAll() {
         List<Product> products = productRepository.findAll();
-        List<ProductDto> productDtos = products.stream().map(p -> PRODUCT_MAPPER.mapProductToProductDto(p)).collect(Collectors.toList());
-        return productDtos;
+        List<ProductResponse> productResponses = products.stream().map(p -> PRODUCT_MAPPER.mapProductToProductResponse(p)).collect(Collectors.toList());
+        return productResponses;
     }
 
-    private Product findProductById(Long id) {
-        Product product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(400, "Product with id " + id + " not found"));
+    private Product findProductById(Long id) throws ResourceNotFoundException {
+        Product product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(400, "Product with id " + id + " not found", null, null));
         return product;
     }
 
-    public ProductDto findById(Long id) {
+    public ProductResponse findById(Long id) throws ResourceNotFoundException {
         Product product = findProductById(id);
-        ProductDto productDto = PRODUCT_MAPPER.mapProductToProductDto(product);
-        return productDto;
+        ProductResponse productResponse = PRODUCT_MAPPER.mapProductToProductResponse(product);
+        return productResponse;
     }
 
-    public ProductDto save(ProductDto productDto) {
-        Product product = productRepository.save(PRODUCT_MAPPER.mapProductDtoToProduct(productDto));
-        return PRODUCT_MAPPER.mapProductToProductDto(product);
+    public ProductResponse save(CreateProductRequest productRequest) throws ResourceAlreadyExistsException, ResourceServiceException {
+        try {
+            Product product = productRepository.save(PRODUCT_MAPPER.mapCreateProductRequestToProduct(productRequest));
+            ProductResponse productResponse = PRODUCT_MAPPER.mapProductToProductResponse(product);
+            return productResponse;
+        } catch (EntityExistsException ex) {
+            throw new ResourceAlreadyExistsException(50001, "Product already exits", null, ex);
+        } catch (RepositoryException ex) {
+            throw new ResourceServiceException(50002, String.format("%s %s", "Error saving product : ", ex.getMessage()), null, ex);
+        }
     }
 
-    public void update(ProductDto productDto) {
-        Product product = productRepository.update(PRODUCT_MAPPER.mapProductDtoToProduct(productDto));
-        productRepository.update(product);
+    public ProductResponse update(UpdateProductRequest updateProductRequest) throws ResourceServiceException {
+        try {
+            Product product = productRepository.update(PRODUCT_MAPPER.mapUpdateProductRequestToProduct(updateProductRequest));
+            product = productRepository.update(product);
+            ProductResponse productResponse = PRODUCT_MAPPER.mapProductToProductResponse(product);
+            return productResponse;
+
+        } catch (RepositoryException ex) {
+            throw new ResourceServiceException(50003, String.format("%s %s", "Error Updating product : ", ex.getMessage()), null, ex);
+        }
     }
 
-    public void delete(Long id) {
+    public void delete(Long id) throws ResourceNotFoundException {
         Product productToDelete = findProductById(id);
         productRepository.delete(productToDelete);
     }
