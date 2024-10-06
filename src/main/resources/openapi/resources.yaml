@@ -4,7 +4,7 @@ info:
   description: API for managing users and products with authentication.
   version: 1.0.0
 servers:
-  - url: http://127.0.0.1:8080/backend/api  # Change this to your server URL
+  - url: http://127.0.0.1:8080/backend/api
 
 components:
   schemas:
@@ -29,13 +29,29 @@ components:
       properties:
         token:
           type: string
+    ValidationError:
+      type: object
+      properties:
+        key:
+          type: string
+          example: name
+
+        message:
+          type: string
+          example: name must be valid
 
     ErrorResponse:
       type: object
       properties:
+        errorCode:
+          type: integer
+          example: 400
         message:
           type: string
-          example: Invalid username or password
+          example: internal error occured
+        traceId:
+          type: string
+          example: 3b12b3b7-22e8-4c4e-8a1a-8c99f9f8b8e3
 
     CreateUserRequest:
       type: object
@@ -62,6 +78,7 @@ components:
         id:
           type: integer
           format: int64
+          example: 123888
         name:
           type: string
           minLength: 3
@@ -78,10 +95,13 @@ components:
         id:
           type: integer
           format: int64
+          example: 123888
         name:
           type: string
+          example: John Doe
         email:
           type: string
+          example: johnd@email.com
 
     CreateProductRequest:
       type: object
@@ -109,6 +129,7 @@ components:
         id:
           type: integer
           format: int64
+          example: 123456
         name:
           type: string
           minLength: 2
@@ -126,11 +147,14 @@ components:
         id:
           type: integer
           format: int64
+          example: 123456
         name:
           type: string
+          example: product name
         price:
           type: number
           format: double
+          example: 39.99
 
   securitySchemes:
     bearerAuth:
@@ -193,7 +217,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserResponse'
-
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     get:
       summary: Get all users
       tags:
@@ -225,6 +260,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
         '404':
           description: User not found
           content:
@@ -280,6 +321,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /products/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID of the product to retrieve
+        schema:
+          type: integer
+    get:
+      summary: Get product by ID
+      tags:
+        - Product
+      responses:
+        '200':
+          description: Product found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   # Products
   /products:
@@ -300,7 +366,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProductResponse'
-
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     get:
       summary: Get all products
       tags:
