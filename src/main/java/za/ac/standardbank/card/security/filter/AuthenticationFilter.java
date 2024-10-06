@@ -29,6 +29,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
             String token = requestContext.getHeaderString("Authorization");
             if (!JwtUtil.validateToken(token)) {
                 requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+                return;
             }
 
             Auth authAnnotation = method.getAnnotation(Auth.class);
