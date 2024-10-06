@@ -13,8 +13,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    # networks:
-    #   - sbsa-network
+      - ./init-scripts:/docker-entrypoint-initdb.d
 
   back-end:
     build:
@@ -32,11 +31,6 @@ services:
     volumes:
       - ./resources:/resources
     restart: on-failure
-    # networks:
-    #   - sbsa-network
 
 volumes:
   postgres_data:
-# networks:
-#   sbsa-network:
-#     external: true
