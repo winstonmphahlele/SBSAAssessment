@@ -7,18 +7,11 @@ import lombok.ToString;
 @ToString
 public class BaseResourceException extends Exception {
 
-    private final String traceId;
     private final int errorCode;
 
-    public BaseResourceException(int errorCode, String message, String traceId, Throwable cause) {
+    public BaseResourceException(int errorCode, String message, Throwable cause) {
         super(message, cause);
         this.errorCode = errorCode;
-        this.traceId = traceId;
     }
 
-
-    @Override
-    public String toString() {
-        return super.toString() + " [traceId=" + traceId + "]";
-    }
 }

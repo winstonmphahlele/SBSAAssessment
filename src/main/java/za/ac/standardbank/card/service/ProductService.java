@@ -31,7 +31,7 @@ public class ProductService {
     }
 
     private Product findProductById(Long id) throws ResourceNotFoundException {
-        Product product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(400, "Product with id " + id + " not found", null, null));
+        Product product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(400, "Product with id " + id + " not found", null));
         return product;
     }
 
@@ -47,9 +47,9 @@ public class ProductService {
             ProductResponse productResponse = PRODUCT_MAPPER.mapProductToProductResponse(product);
             return productResponse;
         } catch (EntityExistsException ex) {
-            throw new ResourceAlreadyExistsException(50001, "Product already exits", null, ex);
+            throw new ResourceAlreadyExistsException(50001, "Product already exits",  ex);
         } catch (RepositoryException ex) {
-            throw new ResourceServiceException(50002, String.format("%s %s", "Error saving product : ", ex.getMessage()), null, ex);
+            throw new ResourceServiceException(50002, String.format("%s %s", "Error saving product : ", ex.getMessage()), ex);
         }
     }
 
@@ -61,9 +61,9 @@ public class ProductService {
             return productResponse;
 
         }catch (ResourceNotFoundException ex) {
-            throw new ResourceNotFoundException(50003, String.format("Product with ID: %s does not exits", updateProductRequest.getId()), null, ex);
+            throw new ResourceNotFoundException(50003, String.format("Product with ID: %s does not exits", updateProductRequest.getId()),  ex);
         } catch (RepositoryException ex) {
-            throw new ResourceServiceException(50003, String.format("%s %s", "Error Updating product : ", ex.getMessage()), null, ex);
+            throw new ResourceServiceException(50003, String.format("%s %s", "Error Updating product : ", ex.getMessage()), ex);
         }
     }
 

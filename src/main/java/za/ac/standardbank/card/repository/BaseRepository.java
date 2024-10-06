@@ -2,6 +2,7 @@ package za.ac.standardbank.card.repository;
 
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
+import org.hibernate.exception.ConstraintViolationException;
 import za.ac.standardbank.card.exception.RepositoryException;
 import za.ac.standardbank.card.exception.ResourceNotFoundException;
 
@@ -24,10 +25,12 @@ public abstract class BaseRepository<T, ID> implements CRUDRepository<T, ID> {
             entityManager.persist(entity);
             return entity;
         } catch (PersistenceException e) {
-            throw new RepositoryException(e.getMessage(), null);
+            checkDuplicateConstraint(e);
+            throw new RepositoryException(e.getMessage());
         }
 
     }
+
     @Override
     @Transactional
     public T update(T entity) throws ResourceNotFoundException, RepositoryException{
@@ -35,16 +38,26 @@ public abstract class BaseRepository<T, ID> implements CRUDRepository<T, ID> {
 
             Optional<T> optionalEntity = findById(getEntityId(entity));
             if (optionalEntity.isEmpty()) {
-                throw new ResourceNotFoundException(5004,"Entity not found!", null, null);
+                throw new ResourceNotFoundException(5004,"Entity not found!", null);
             }
 
             T updatedEntity = entityManager.merge(entity);
             return updatedEntity;
         } catch (PersistenceException e) {
-            throw new RepositoryException(e.getMessage(), null);
+            throw new RepositoryException(e.getMessage());
         }
     }
 
+
+    private void checkDuplicateConstraint(PersistenceException e) {
+        Throwable cause = e.getCause();
+        if (cause instanceof ConstraintViolationException) {
+            String sqlState = ((ConstraintViolationException) cause).getSQLState();
+            if ("23505".equals(sqlState)) {
+                throw new EntityExistsException("Entity already exists");
+            }
+        }
+    }
     @Override
     public Optional<T> findById(ID id) {
         T entity = entityManager.find(getEntityClass(), id);

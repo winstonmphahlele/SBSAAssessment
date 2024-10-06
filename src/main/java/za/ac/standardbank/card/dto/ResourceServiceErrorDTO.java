@@ -10,5 +10,4 @@ import lombok.*;
 public class ResourceServiceErrorDTO {
 	private int errorCode;
 	private String message = "";
-	private String traceId ="";
 }

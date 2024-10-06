@@ -31,7 +31,7 @@ public class UserService {
     }
 
     private User findUserById(Long id) throws ResourceNotFoundException {
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(50004, "User with id " + id + " not found", null, null));
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(50004, "User with id " + id + " not found", null));
         return user;
     }
 
@@ -47,9 +47,9 @@ public class UserService {
             UserResponse response = USER_MAPPER.mapUserToUserResponse(user);
             return response;
         } catch (EntityExistsException ex) {
-            throw new ResourceAlreadyExistsException(50001, "User already exits", null, ex);
+            throw new ResourceAlreadyExistsException(50001, "User already exits", ex);
         } catch (RepositoryException ex) {
-            throw new ResourceServiceException(50002, String.format("%s %s", "Error Saving user : ", ex.getMessage()), null, ex);
+            throw new ResourceServiceException(50002, String.format("%s %s", "Error Saving user : ", ex.getMessage()),  ex);
         }
     }
 
@@ -59,9 +59,9 @@ public class UserService {
             UserResponse userResponse = USER_MAPPER.mapUserToUserResponse(updatedUser);
             return userResponse;
         }catch (ResourceNotFoundException ex) {
-            throw new ResourceNotFoundException(50004, String.format("User with ID: %s does not exits", updateUserRequest.getId()), null, ex);
+            throw new ResourceNotFoundException(50004, String.format("User with ID: %s does not exits", updateUserRequest.getId()), ex);
         } catch (RepositoryException ex) {
-            throw new ResourceServiceException(50004, String.format("%s %s", "Error Updating user : ", ex.getMessage()), null, ex);
+            throw new ResourceServiceException(50004, String.format("%s %s", "Error Updating user : ", ex.getMessage()), ex);
         }
     }
 
