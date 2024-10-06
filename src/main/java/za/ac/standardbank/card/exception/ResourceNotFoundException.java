@@ -1,23 +1,9 @@
 package za.ac.standardbank.card.exception;
 
 
-public class ResourceNotFoundException extends  RuntimeException{
+public class ResourceNotFoundException extends  BaseResourceException{
 
-    private int errorCode;
-    private String message;
-
-    public ResourceNotFoundException(int errorCode, String message){
-        super(message);
-        this.errorCode = errorCode;
-        this.message = message;
-    }
-
-    @Override
-    public String getMessage() {
-        return message;
-    }
-
-    public int getErrorCode() {
-        return errorCode;
+    public ResourceNotFoundException(int errorCode, String message, Throwable cause) {
+        super(errorCode, message, cause);
     }
 }

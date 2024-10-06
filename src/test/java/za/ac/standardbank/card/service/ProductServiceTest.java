@@ -5,10 +5,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import za.ac.standardbank.card.dto.ProductDto;
+import za.ac.standardbank.card.exception.ResourceAlreadyExistsException;
 import za.ac.standardbank.card.exception.ResourceNotFoundException;
+import za.ac.standardbank.card.exception.ResourceServiceException;
 import za.ac.standardbank.card.model.Product;
 import za.ac.standardbank.card.repository.implementation.ProductRepository;
+import za.ac.standardbank.generated.CreateProductRequest;
+import za.ac.standardbank.generated.ProductResponse;
+import za.ac.standardbank.generated.UpdateProductRequest;
 
 import java.util.Collections;
 import java.util.List;
@@ -27,8 +31,8 @@ public class ProductServiceTest {
     private ProductRepository productRepository;
 
     private Product product;
-    private ProductDto productDto;
-
+    private CreateProductRequest createProductRequest;
+    private UpdateProductRequest updateProductRequest;
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -37,26 +41,30 @@ public class ProductServiceTest {
         product.setId(1L);
         product.setPrice(29.99);
 
-        productDto = new ProductDto();
-        productDto.setPrice(29.99);
+        createProductRequest = new CreateProductRequest();
+        createProductRequest.setPrice(29.99);
+
+        updateProductRequest = new UpdateProductRequest();
+        product.setId(1L);
+        updateProductRequest.setPrice(59.99);
     }
 
     @Test
     public void testFindAll() {
         when(productRepository.findAll()).thenReturn(Collections.singletonList(product));
-        List<ProductDto> productDtos = productService.findAll();
-        assertEquals(1, productDtos.size());
-        assertEquals(product.getName(), productDtos.get(0).getName());
-        assertEquals(product.getPrice(), productDtos.get(0).getPrice());
+        List<ProductResponse> foundProducts = productService.findAll();
+        assertEquals(1, foundProducts.size());
+        assertEquals(product.getName(), foundProducts.get(0).getName());
+        assertEquals(product.getPrice(), foundProducts.get(0).getPrice());
         verify(productRepository).findAll();
     }
 
     @Test
-    public void testFindById_productExists() {
+    public void testFindById_productExists() throws ResourceNotFoundException {
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
-        ProductDto foundproductDto = productService.findById(1L);
-        assertEquals(product.getName(), foundproductDto.getName());
-        assertEquals(product.getPrice(), foundproductDto.getPrice());
+        ProductResponse foundproduct = productService.findById(1L);
+        assertEquals(product.getName(), foundproduct.getName());
+        assertEquals(product.getPrice(), foundproduct.getPrice());
         verify(productRepository).findById(1L);
     }
 
@@ -69,22 +77,22 @@ public class ProductServiceTest {
     }
 
     @Test
-    public void testSave() {
+    public void testSave() throws ResourceServiceException, ResourceAlreadyExistsException {
         when(productRepository.save(any(Product.class))).thenReturn(product);
 
-        ProductDto savedproductDto = productService.save(productDto);
+        ProductResponse savedproduct = productService.save(createProductRequest);
 
-        assertNotNull(savedproductDto, "Saved ProductDto should not be null");
+        assertNotNull(savedproduct, "Saved ProductDto should not be null");
 
-        assertEquals(productDto.getName(), savedproductDto.getName());
-        assertEquals(productDto.getPrice(), savedproductDto.getPrice());
+        assertEquals(createProductRequest.getName(), savedproduct.getName());
+        assertEquals(createProductRequest.getPrice(), savedproduct.getPrice());
         verify(productRepository).save(any(Product.class));
     }
 
     @Test
-    public void testUpdate() {
+    public void testUpdate() throws ResourceNotFoundException, ResourceServiceException {
         when(productRepository.save(any(Product.class))).thenReturn(product);
-        productService.update(productDto);
+        ProductResponse productResponse = productService.update(updateProductRequest);
         verify(productRepository).update(any(Product.class));
     }
 

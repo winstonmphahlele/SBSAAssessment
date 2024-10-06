@@ -1,4 +1,4 @@
-package za.ac.standardbank.card.security.util;
+package za.ac.standardbank.card.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

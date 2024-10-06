@@ -22,4 +22,9 @@ public class UserRepository extends BaseRepository<User, Long> {
     protected Class<User> getEntityClass() {
         return User.class;
     }
+
+    @Override
+    protected Long getEntityId(User user) {
+        return user.getId();
+    }
 }

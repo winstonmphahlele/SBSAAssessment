@@ -20,4 +20,8 @@ public class ProductRepository extends BaseRepository<Product, Long> {
         return Product.class;
     }
 
+    @Override
+    protected Long getEntityId(Product product) {
+        return product.getId();
+    }
 }

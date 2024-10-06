@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import za.ac.standardbank.card.exception.ResourceNotFoundException;
 import za.ac.standardbank.card.model.Product;
 
 import java.util.Collections;
@@ -65,13 +66,20 @@ public class ProductRepositoryTest {
     }
 
     @Test
-    public void testUpdate() {
+    public void testUpdate() throws ResourceNotFoundException {
+        when(entityManager.find(Product.class, 1L)).thenReturn(product);
         when(entityManager.merge(any(Product.class))).thenReturn(product);
+
+        productRepository.save(product);
+        product.setName("Updated Product");
+
         Product updatedProduct = productRepository.update(product);
+
         assertEquals(product.getName(), updatedProduct.getName());
         assertEquals(product.getPrice(), updatedProduct.getPrice());
+
         verify(entityManager).merge(product);
-        verifyNoMoreInteractions(entityManager);
+
     }
 
     @Test

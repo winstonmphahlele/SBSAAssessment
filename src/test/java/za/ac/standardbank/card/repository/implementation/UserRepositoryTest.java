@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import za.ac.standardbank.card.exception.ResourceNotFoundException;
 import za.ac.standardbank.card.model.User;
 
 import java.util.Collections;
@@ -69,12 +70,30 @@ public class UserRepositoryTest {
     }
 
     @Test
-    public void testUpdate() {
+    public void testUpdate() throws ResourceNotFoundException {
+        when(entityManager.find(User.class, 1L)).thenReturn(user);
         when(entityManager.merge(any(User.class))).thenReturn(user);
+
+        userRepository.save(user);
+        user.setName("Foo Bar");
+
         User updatedUser = userRepository.update(user);
+
+        assertEquals(updatedUser.getName(), user.getName());
         assertEquals(user.getEmail(), updatedUser.getEmail());
         verify(entityManager).merge(user);
-        verifyNoMoreInteractions(entityManager);
+    }
+
+    @Test
+    public void testUpdate_NonExistingUser() {
+        when(entityManager.find(User.class, 1L)).thenReturn(null);
+
+        Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
+            userRepository.update(user);
+        });
+
+        assertEquals("Entity not found!", exception.getMessage());
+        verify(entityManager, never()).merge(any(User.class));
     }
 
     @Test
