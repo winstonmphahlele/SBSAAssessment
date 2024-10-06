@@ -16,6 +16,7 @@ services:
       - ./init-scripts:/docker-entrypoint-initdb.d
 
   back-end:
+    container_name: "back-end"
     build:
       context: .
       dockerfile: Dockerfile
