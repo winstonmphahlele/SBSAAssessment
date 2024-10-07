@@ -1,5 +1,5 @@
 # create java 11 wildfly container
-FROM openjdk:11-jdk-slim as java11-wildfly33
+FROM openjdk:11-jdk-slim AS java11-wildfly33
 
 ENV WILDFLY_VERSION=33.0.2.Final
 ENV WILDFLY_HOME=/opt/jboss/wildfly
@@ -47,6 +47,8 @@ RUN $WILDFLY_HOME/bin/jboss-cli.sh --file=/resources/$DATA_SOURCE_CLI
 
 RUN rm -rf $WILDFLY_HOME/standalone/configuration/standalone_xml_history
 
-EXPOSE 8080 9990
+ADD standalone.conf $WILDFLY_HOME/bin/
+
+EXPOSE 8080 9990 5005
 
 CMD ["/bin/bash", "-c", "$WILDFLY_HOME/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0"]
