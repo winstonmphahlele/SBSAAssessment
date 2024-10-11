@@ -1,4 +1,4 @@
-## Standarddank Assessment Challenge
+## StandardBank Assessment Challenge
 
 Jakarta EE Application with REST, Authentication, and Database Integration
 
